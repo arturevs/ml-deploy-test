@@ -183,7 +183,7 @@ class IntentClassifier:
     def _load_intents(self, examples_file):
         self.examples_file = examples_file
         if examples_file is not None:
-            pprint(f"Loading intents from {examples_file}...")
+            print(f"Loading intents from {examples_file}...")
             with open(examples_file, 'r') as f:
                 self.intents_data = yaml.safe_load(f)
             # Preprocess intents
@@ -363,7 +363,8 @@ class IntentClassifier:
                 name=f"{self.config.dataset_name}-clf-v1",
                 type="model",
                 description="Modelo Keras v1 para classificação de intenção"
-            ).add_file(path)
+            )
+            artifact.add_file(path)
             self.wandb_run.log_artifact(artifact)
             self.wandb_run.finish()
 

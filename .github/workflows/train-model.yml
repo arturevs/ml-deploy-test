@@ -1,0 +1,46 @@
+# Workflow para treinar o modelo automaticamente ao alterar dados de treinamento
+name: Train Model on Data Change
+
+on:
+  push:
+    paths:
+      - 'tools/macro_level/*.yml'
+      - 'tools/intent_classifier.py'
+      - 'requirements.txt'
+      - 'pyproject.toml'
+
+jobs:
+  train-model:
+    runs-on: ubuntu-latest
+    environment: dev
+    env:
+      WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
+      WANDB_PROJECT: ${{ secrets.WANDB_PROJECT }}
+      WANDB_MODEL_URL: ${{ secrets.WANDB_MODEL_URL }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          # Install a specific version of uv.
+          version: "0.7.8"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: ".python-version"
+
+      - name: Install dependencies
+        run: |
+          uv sync
+
+      - name: Train model
+        run: |
+          uv run python tools/intent_classifier.py train \
+            --config="tools/macro_level/macro_level_config.yml" \
+            --examples_file="tools/macro_level/macro_level_examples.yml" \
+            --save_model="tools/macro_level/macro_level-clf-v1.keras"
+
+      # (Opcional) Adicione steps para upload do modelo, build/push Docker, etc.

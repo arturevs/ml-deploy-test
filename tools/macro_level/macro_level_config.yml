@@ -1,0 +1,8 @@
+wandb_project: "macro_level_classifier"
+dataset_name: "macro_level"
+sent_hl_units: 16
+sent_dropout: 0.1
+learning_rate: 0.0005
+epochs: 1000
+callback_patience: 20
+validation_split: 0.1
