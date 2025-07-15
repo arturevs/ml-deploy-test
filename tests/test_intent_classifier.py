@@ -19,8 +19,8 @@ class _DummyModel:
         return np.tile(np.array([[0.1, 0.9]]), (n, 1))
 
 
-class IntentClassifierTest(unittest.TestCase):
-    """Testes unitários autocontidos para o IntentClassifier."""
+class MacroLevelClassifierTest(unittest.TestCase):
+    """Testes unitários autocontidos para o MacroLevelClassifier (antigo IntentClassifier)."""
 
     def setUp(self):
         print(f"\n🧪 Running {self._testMethodName}...")
@@ -38,8 +38,12 @@ class IntentClassifierTest(unittest.TestCase):
         env_url = os.getenv("WANDB_MODEL_URL")
         if env_url:
             print("\n🌐 WANDB_MODEL_URL detected, loading real model...")
-            cls.clf = IntentClassifier()
-            print("✅ Model loaded from WandB")
+            # Usa arquivos macro_level por padrão
+            cls.clf = IntentClassifier(
+                config="tools/macro_level/macro_level_config.yml",
+                examples_file="tools/macro_level/macro_level_examples.yml"
+            )
+            print("✅ Model loaded from WandB (macro_level)")
         else:
             print("\n🤖 Using dummy model for tests")
             cfg = Config(dataset_name="dummy", codes=["foo", "bar"])
@@ -113,10 +117,11 @@ class IntentClassifierTest(unittest.TestCase):
         url = os.getenv("WANDB_MODEL_URL")
         if url:
             print("🌐 Using model from WANDB for accuracy check")
+            examples_path = os.path.join("tools", "macro_level", "macro_level_examples.yml")
         else:
             print("⚙️ Using dummy model for accuracy demonstration")
+            examples_path = os.path.join(os.path.dirname(__file__), "..", "tools", "macro_level", "macro_level_examples.yml")
 
-        examples_path = os.path.join(os.path.dirname(__file__), "..", "tools", "confusion", "confusion_examples.yml")
         with open(examples_path, "r") as f:
             data = yaml.safe_load(f)
 
@@ -153,5 +158,5 @@ class IntentClassifierTest(unittest.TestCase):
             print("ℹ️ WANDB_MODEL_URL not set - skipping accuracy assertion")
 
 
-if __name__ == "__main__":       # Permite `python test_intent_classifier.py`
+if __name__ == "__main__":       # Permite `python test_macro_level.py`
     unittest.main()
