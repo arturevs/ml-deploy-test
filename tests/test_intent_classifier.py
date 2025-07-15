@@ -27,22 +27,21 @@ class IntentClassifierTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-            # Força dummy model no CI
+        # Força dummy model no ambiente CI
         if os.getenv("CI") == "true":
             print("\n🤖 Forçando dummy model no ambiente CI")
             cfg = Config(dataset_name="dummy", codes=["foo", "bar"])
             cls.clf = IntentClassifier(config=cfg, load_model=None, examples_file=None)
             cls.clf.model = _DummyModel()
             return
+        # Comportamento normal fora do CI
         env_url = os.getenv("WANDB_MODEL_URL")
         if env_url:
             print("\n🌐 WANDB_MODEL_URL detected, loading real model...")
-            # Quando WANDB_MODEL_URL estiver definido, o IntentClassifier buscará o modelo automaticamente
             cls.clf = IntentClassifier()
             print("✅ Model loaded from WandB")
         else:
             print("\n🤖 Using dummy model for tests")
-            # Config minimalista com duas intenções usando modelo dummy
             cfg = Config(dataset_name="dummy", codes=["foo", "bar"])
             cls.clf = IntentClassifier(config=cfg, load_model=None, examples_file=None)
             cls.clf.model = _DummyModel()
