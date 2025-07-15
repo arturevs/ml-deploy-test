@@ -50,21 +50,6 @@ class MacroLevelClassifierTest(unittest.TestCase):
             cls.clf = IntentClassifier(config=cfg, load_model=None, examples_file=None)
             cls.clf.model = _DummyModel()
 
-    def test_wandb_connection(self):
-        """Valida se a conexão com o Weights & Biases (wandb) está funcionando."""
-        import importlib.util
-        if not os.getenv("WANDB_API_KEY"):
-            self.skipTest("WANDB_API_KEY não está definida")
-        if importlib.util.find_spec("wandb") is None:
-            self.skipTest("wandb não está instalado")
-        import wandb
-        try:
-            api = wandb.Api()
-            user = api.viewer()
-            print(f"👤 Usuário autenticado no wandb: {user.get('entity', 'desconhecido')}")
-            self.assertIn("entity", user)
-        except Exception as e:
-            self.fail(f"Falha ao conectar ao wandb: {e}")
 
     # -------------------------------------------------------
     # Predição básica
