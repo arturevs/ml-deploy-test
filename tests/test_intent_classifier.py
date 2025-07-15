@@ -25,30 +25,30 @@ class MacroLevelClassifierTest(unittest.TestCase):
     def setUp(self):
         print(f"\n🧪 Running {self._testMethodName}...")
 
-    @classmethod
-    def setUpClass(cls):
-        # Força dummy model no ambiente CI
-        if os.getenv("CI") == "true":
-            print("\n🤖 Forçando dummy model no ambiente CI")
-            cfg = Config(dataset_name="dummy", codes=["foo", "bar"])
-            cls.clf = IntentClassifier(config=cfg, load_model=None, examples_file=None)
-            cls.clf.model = _DummyModel()
-            return
-        # Comportamento normal fora do CI
-        env_url = os.getenv("WANDB_MODEL_URL")
-        if env_url:
-            print("\n🌐 WANDB_MODEL_URL detected, loading real model...")
-            # Usa arquivos macro_level por padrão
-            cls.clf = IntentClassifier(
-                config="tools/macro_level/macro_level_config.yml",
-                examples_file="tools/macro_level/macro_level_examples.yml"
-            )
-            print("✅ Model loaded from WandB (macro_level)")
-        else:
-            print("\n🤖 Using dummy model for tests")
-            cfg = Config(dataset_name="dummy", codes=["foo", "bar"])
-            cls.clf = IntentClassifier(config=cfg, load_model=None, examples_file=None)
-            cls.clf.model = _DummyModel()
+@classmethod
+def setUpClass(cls):
+    # Sempre força dummy model no CI
+    if os.getenv("CI") == "true":
+        print("\n🤖 Forçando dummy model no ambiente CI")
+        cfg = Config(dataset_name="dummy", codes=["foo", "bar"])
+        cls.clf = IntentClassifier(config=cfg, load_model=None, examples_file=None)
+        cls.clf.model = _DummyModel()
+        return
+    # Fora do CI, segue lógica normal
+    env_url = os.getenv("WANDB_MODEL_URL")
+    if env_url:
+        print("\n🌐 WANDB_MODEL_URL detected, loading real model...")
+        cls.clf = IntentClassifier(
+            config="tools/macro_level/macro_level_config.yml",
+            examples_file="tools/macro_level/macro_level_examples.yml",
+            load_model="tools/macro_level/macro_level-clf-v1.keras"
+        )
+        print("✅ Model loaded from WandB (macro_level)")
+    else:
+        print("\n🤖 Using dummy model for tests")
+        cfg = Config(dataset_name="dummy", codes=["foo", "bar"])
+        cls.clf = IntentClassifier(config=cfg, load_model=None, examples_file=None)
+        cls.clf.model = _DummyModel()
 
 
     # -------------------------------------------------------
